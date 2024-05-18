@@ -1,0 +1,53 @@
+class Agent:
+    def __init__(self, game_map):
+        self.game_map = game_map
+        self.position = self.find_start()
+        self.score = 0
+
+    def find_start(self):
+        for i, row in enumerate(self.game_map.map):
+            for j, tile in enumerate(row):
+                if tile.symbol == '&':
+                    return (i, j)
+
+    def move(self, direction):
+        new_position = self.get_new_position(direction)
+        if self.is_valid_move(new_position):
+            self.position = new_position
+            self.update_score(new_position)
+
+    def get_new_position(self, direction):
+        i, j = self.position
+        if direction == 'up':
+            return (i-1, j)
+        elif direction == 'down':
+            return (i+1, j)
+        elif direction == 'left':
+            return (i, j-1)
+        elif direction == 'right':
+            return (i, j+1)
+        return self.position
+
+    def is_valid_move(self, position):
+        i, j = position
+        if 0 <= i < len(self.game_map.map) and 0 <= j < len(self.game_map.map[0]):
+            return self.game_map.map[i][j].is_walkable
+        return False
+
+    def update_score(self, position):
+        i, j = position
+        tile = self.game_map.map[i][j]
+        if tile.is_end:
+            self.score += 100  # Reached the end
+        else:
+            self.score -= tile.penalty  # Apply penalty if any
+
+    def get_score(self):
+        return self.score
+
+# Example usage
+agent = Agent(game_map)
+moves = ['down', 'right', 'right', 'right', 'down']
+for move in moves:
+    agent.move(move)
+print(f"Agent's final score: {agent.get_score()}")

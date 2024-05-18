@@ -1,0 +1,47 @@
+import numpy as np
+
+class Agent:
+    def __init__(self, game_map):
+        self.game_map = game_map
+        self.position = self.find_start()
+
+    def find_start(self):
+        for i, row in enumerate(self.game_map.map):
+            for j, tile in enumerate(row):
+                if tile.symbol == '&':
+                    return (i, j)
+
+    def move(self, direction):
+        new_position = self.get_new_position(direction)
+        if self.is_valid_move(new_position):
+            self.position = new_position
+
+    def get_new_position(self, direction):
+        i, j = self.position
+        if direction == 'up':
+            return (i-1, j)
+        elif direction == 'down':
+            return (i+1, j)
+        elif direction == 'left':
+            return (i, j-1)
+        elif direction == 'right':
+            return (i, j+1)
+        return self.position
+
+    def is_valid_move(self, position):
+        i, j = position
+        if 0 <= i < len(self.game_map.map) and 0 <= j < len(self.game_map.map[0]):
+            return self.game_map.map[i][j].is_walkable
+        return False
+
+    def decide_move(self):
+        directions = ['up', 'down', 'left', 'right']
+        valid_moves = [direction for direction in directions if self.is_valid_move(self.get_new_position(direction))]
+        return np.random.choice(valid_moves)
+
+# Example usage
+agent = Agent(game_map)
+for _ in range(10):
+    move = agent.decide_move()
+    agent.move(move)
+    print(f"Agent moved {move} to position {agent.position}")
